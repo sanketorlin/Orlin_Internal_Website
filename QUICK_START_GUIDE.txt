@@ -1,0 +1,86 @@
+================================================================================
+  BI DASHBOARD PORTAL - QUICK START GUIDE
+================================================================================
+
+STEP 1: INSTALL NODE.JS (REQUIRED - ONE TIME ONLY)
+----------------------------------------------------
+1. Open your web browser
+2. Go to: https://nodejs.org/
+3. Click the big green "LTS" button (recommended version)
+4. Save and run the downloaded file (e.g., node-v20.x.x-x64.msi)
+5. In the installer:
+   - Click "Next" through all steps
+   - Make sure "Add to PATH" is checked (it should be by default)
+   - Click "Install"
+   - Wait for installation to finish
+   - Click "Finish"
+6. RESTART YOUR COMPUTER (important!)
+
+STEP 2: START THE WEBSITE
+--------------------------
+After restarting, you have 3 options:
+
+OPTION A - Easiest (Double-click):
+  1. Double-click "start-website.bat" in this folder
+  2. Wait for it to start
+  3. Website opens automatically
+
+OPTION B - PowerShell Script:
+  1. Right-click "setup-and-run.ps1"
+  2. Select "Run with PowerShell"
+  3. Follow the prompts
+
+OPTION C - Manual (PowerShell):
+  1. Right-click in this folder
+  2. Select "Open in Terminal" or "Open PowerShell here"
+  3. Type: npm run dev
+  4. Press Enter
+  5. Open http://localhost:3000 in your browser
+
+STEP 3: LOGIN
+-------------
+Use these credentials:
+
+Team Head (Full Access):
+  Email: john@example.com
+  Password: password123
+
+Sales User (Limited Access):
+  Email: jane@example.com
+  Password: password123
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Problem: "node is not recognized"
+Solution: Node.js is not installed. Follow STEP 1 above.
+
+Problem: "ERR_CONNECTION_REFUSED"
+Solution: The server is not running. Follow STEP 2 above.
+
+Problem: Port 3000 already in use
+Solution: The server will automatically use port 3001, 3002, etc.
+         Check the terminal output for the actual URL.
+
+Problem: "npm is not recognized"
+Solution: Node.js is not installed or PATH is not updated.
+         Install Node.js and RESTART your computer.
+
+Problem: Website won't load
+Solution: 
+  1. Make sure the server is running (you should see output in terminal)
+  2. Check the URL in terminal (might be port 3001, 3002, etc.)
+  3. Try refreshing the browser
+  4. Try closing and reopening the browser
+
+================================================================================
+NEED HELP?
+================================================================================
+Check these files for more details:
+- INSTALL_AND_RUN.md (detailed installation guide)
+- START_WEBSITE.md (website startup guide)
+- README.md (full project documentation)
+
+================================================================================
+

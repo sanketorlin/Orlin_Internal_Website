@@ -1,0 +1,44 @@
+{
+  "reports": [
+    {
+      "id": "sales-report",
+      "title": "Sales Report",
+      "description": "Comprehensive sales analytics and performance metrics",
+      "url": "https://app.powerbi.com/view?r=eyJrIjoiOGRhNTUwZTMtOTIxMS00YTk3LTgwMzgtMWFhYjI2ZDVhMWI5IiwidCI6ImY2NTU3YTAxLTMzMGYtNDM1MC05ZTE2LTQ5OGZkZmQ4MDY4YSJ9",
+      "iframe": true,
+      "allowedRoles": ["team-head", "sales"],
+      "icon": "📊",
+      "category": "Sales"
+    },
+    {
+      "id": "finance-report",
+      "title": "Finance Report",
+      "description": "Financial overview and budget analysis",
+      "url": "https://example.com/finance-dashboard",
+      "iframe": true,
+      "allowedRoles": ["team-head"],
+      "icon": "💰",
+      "category": "Finance"
+    },
+    {
+      "id": "hr-report",
+      "title": "HR Report",
+      "description": "Human resources metrics and employee analytics",
+      "url": "https://example.com/hr-dashboard",
+      "iframe": true,
+      "allowedRoles": ["team-head"],
+      "icon": "👥",
+      "category": "HR"
+    },
+    {
+      "id": "marketing-report",
+      "title": "Marketing Report",
+      "description": "Marketing campaigns and performance tracking",
+      "url": "https://example.com/marketing-dashboard",
+      "iframe": true,
+      "allowedRoles": ["team-head"],
+      "icon": "📈",
+      "category": "Marketing"
+    }
+  ]
+}

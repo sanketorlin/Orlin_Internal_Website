@@ -1,0 +1,71 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                    ⚡  QUICK GIT COMMANDS REFERENCE                      ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+After setting up automatic deployment, you only need these commands:
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ DAILY WORKFLOW (3 Commands)                                              │
+└──────────────────────────────────────────────────────────────────────────┘
+
+1. Stage all changes:
+   git add .
+
+2. Commit with message:
+   git commit -m "Description of your changes"
+   
+   Examples:
+   git commit -m "Added new user"
+   git commit -m "Fixed login bug"
+   git commit -m "Updated reports configuration"
+
+3. Push to GitHub (triggers automatic deployment):
+   git push
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ ONE-TIME SETUP COMMANDS                                                  │
+└──────────────────────────────────────────────────────────────────────────┘
+
+First time only:
+
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/REPO_NAME.git
+git push -u origin main
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ USEFUL COMMANDS                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+
+Check status:
+git status
+
+See what changed:
+git diff
+
+See commit history:
+git log
+
+Update from GitHub:
+git pull
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ EXAMPLE WORKFLOW                                                         │
+└──────────────────────────────────────────────────────────────────────────┘
+
+You added a new user to users.json:
+
+1. Edit and save: src/config/users.json
+2. Run:
+   git add .
+   git commit -m "Added new user to users.json"
+   git push
+3. Wait 1-2 minutes
+4. ✅ Website automatically updated!
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║  That's it! Just 3 commands for daily updates!                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+

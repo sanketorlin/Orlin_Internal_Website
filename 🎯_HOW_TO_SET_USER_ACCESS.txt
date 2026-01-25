@@ -1,0 +1,187 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                    🎯  HOW TO SET USER ACCESS                            ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ QUICK ANSWER                                                              │
+└──────────────────────────────────────────────────────────────────────────┘
+
+After adding user in Firebase Studio, add them to:
+→ src/config/users.json
+
+The "role" you give them determines which dashboards they see!
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ STEP-BY-STEP PROCESS                                                     │
+└──────────────────────────────────────────────────────────────────────────┘
+
+STEP 1: Add User in Firebase (Authentication Only)
+────────────────────────────────────────────────────
+1. Firebase Console → Authentication → Users
+2. Click "Add user"
+3. Enter email and password
+4. Click "Add user"
+
+This only allows them to LOGIN. It doesn't set what they can see!
+
+STEP 2: Add User to users.json (THIS SETS THEIR ACCESS!)
+─────────────────────────────────────────────────────────
+1. Open: src/config/users.json
+
+2. Add the user with a ROLE:
+
+   {
+     "users": {
+       "newuser@gmail.com": {
+         "email": "newuser@gmail.com",
+         "role": "sales",        ← THIS determines access!
+         "name": "User Name"
+       }
+     }
+   }
+
+3. Save the file
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ ROLE SYSTEM - Which Dashboards They See                                  │
+└──────────────────────────────────────────────────────────────────────────┘
+
+ROLE: "team-head" (Super Admin)
+→ Sees ALL dashboards
+→ Can add/edit/delete reports
+→ Full access
+
+ROLE: "sales"
+→ Sees ONLY Sales reports
+→ Cannot manage reports
+
+ROLE: "finance"
+→ Sees ONLY Finance reports
+→ Cannot manage reports
+
+ROLE: "hr"
+→ Sees ONLY HR reports
+→ Cannot manage reports
+
+ROLE: "marketing"
+→ Sees ONLY Marketing reports
+→ Cannot manage reports
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ HOW IT WORKS                                                              │
+└──────────────────────────────────────────────────────────────────────────┘
+
+1. Reports have "allowedRoles" in src/config/reports.json
+
+   Example:
+   {
+     "id": "sales-report",
+     "allowedRoles": ["team-head", "sales"]  ← Who can see this
+   }
+
+2. Users have a "role" in src/config/users.json
+
+   Example:
+   {
+     "email": "user@gmail.com",
+     "role": "sales"  ← Their access level
+   }
+
+3. System matches:
+   - User role "sales" + Report allowedRoles ["sales"] = ✅ Can see
+   - User role "sales" + Report allowedRoles ["finance"] = ❌ Cannot see
+   - User role "team-head" = ✅ Sees everything!
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ EXAMPLES                                                                  │
+└──────────────────────────────────────────────────────────────────────────┘
+
+EXAMPLE 1: Sales Manager
+─────────────────────────
+Firebase: Add user "sales@company.com"
+users.json:
+  {
+    "sales@company.com": {
+      "email": "sales@company.com",
+      "role": "sales",
+      "name": "Sales Manager"
+    }
+  }
+
+Result: Sees ONLY Sales Report (because it has "sales" in allowedRoles)
+
+EXAMPLE 2: Finance Director
+────────────────────────────
+Firebase: Add user "finance@company.com"
+users.json:
+  {
+    "finance@company.com": {
+      "email": "finance@company.com",
+      "role": "finance",
+      "name": "Finance Director"
+    }
+  }
+
+Result: Sees ONLY Finance Report (if it has "finance" in allowedRoles)
+
+EXAMPLE 3: Super Admin (You)
+─────────────────────────────
+Firebase: Add user "sanket8412@gmail.com"
+users.json:
+  {
+    "sanket8412@gmail.com": {
+      "email": "sanket8412@gmail.com",
+      "role": "team-head",  ← Super Admin
+      "name": "Sanket"
+    }
+  }
+
+Result: Sees ALL reports (team-head sees everything!)
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ CURRENT REPORTS & ACCESS                                                  │
+└──────────────────────────────────────────────────────────────────────────┘
+
+Sales Report:
+  allowedRoles: ["team-head", "sales"]
+  → team-head can see ✅
+  → sales can see ✅
+  → finance/hr/marketing cannot see ❌
+
+Finance Report:
+  allowedRoles: ["team-head"]
+  → Only team-head can see ✅
+  → Others cannot see ❌
+
+HR Report:
+  allowedRoles: ["team-head"]
+  → Only team-head can see ✅
+
+Marketing Report:
+  allowedRoles: ["team-head"]
+  → Only team-head can see ✅
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ TO CHANGE WHICH REPORTS A ROLE CAN SEE                                   │
+└──────────────────────────────────────────────────────────────────────────┘
+
+Edit: src/config/reports.json
+
+Change the "allowedRoles" array:
+
+  {
+    "id": "finance-report",
+    "allowedRoles": ["team-head", "finance"],  ← Add "finance" here
+    ...
+  }
+
+Now users with role "finance" can see this report!
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║  SUMMARY:                                                                ║
+║  1. Add user in Firebase (for login)                                     ║
+║  2. Add user in users.json with a ROLE (for access)                     ║
+║  3. Role determines which dashboards they see                            ║
+║  4. Edit reports.json to change which roles can see which reports       ║
+╚══════════════════════════════════════════════════════════════════════════╝
+

@@ -1,0 +1,19 @@
+{
+  "users": {
+    "sanket8412@gmail.com": {
+      "email": "sanket8412@gmail.com",
+      "role": "team-head",
+      "name": "Sanket"
+    },
+    "john@example.com": {
+      "email": "john@example.com",
+      "role": "team-head",
+      "name": "John Doe"
+    },
+    "jane@example.com": {
+      "email": "jane@example.com",
+      "role": "sales",
+      "name": "Jane Smith"
+    }
+  }
+}

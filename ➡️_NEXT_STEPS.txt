@@ -1,0 +1,71 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                    ➡️  NEXT STEPS - YOU'RE ON VERCEL DASHBOARD           ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+You're on the Vercel dashboard! Good!
+
+Since your project is on your computer (not on GitHub), we'll use the CLI method.
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ OPTION 1: Use CLI Method (Recommended - Easiest)                        │
+└──────────────────────────────────────────────────────────────────────────┘
+
+1. CLOSE the Vercel dashboard browser tab (or keep it open, doesn't matter)
+
+2. Go back to your project folder:
+   C:\Users\sanke\OneDrive\Desktop\Work Flow Analysis Web
+
+3. Double-click: START_DEPLOYMENT.bat
+   (or deploy-to-vercel.bat)
+
+4. A terminal window will open
+
+5. When it asks to login:
+   → It will open browser again
+   → You're already logged in!
+   → Just authorize if needed
+
+6. Follow the terminal prompts:
+   → "Set up and deploy?" → Y
+   → "Link to existing?" → N
+   → "Project name?" → Enter
+   → "Directory?" → Enter
+   → "Override settings?" → N
+
+7. Wait 1-2 minutes
+
+8. Get your URL: https://your-project.vercel.app
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ OPTION 2: Use Git Method (For Future - More Advanced)                    │
+└──────────────────────────────────────────────────────────────────────────┘
+
+If you want to use Git (for automatic deployments):
+
+1. Create GitHub account (if you don't have one)
+2. Create a new repository on GitHub
+3. Upload your code to GitHub
+4. On Vercel dashboard, click "Continue with GitHub"
+5. Select your repository
+6. Deploy automatically
+
+But for now, CLI method is easier!
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ ✅ RECOMMENDED: Use CLI Method                                           │
+└──────────────────────────────────────────────────────────────────────────┘
+
+Since you're already logged into Vercel:
+
+1. Close or minimize the browser
+2. Go to your project folder
+3. Double-click: START_DEPLOYMENT.bat
+4. Follow the terminal prompts
+5. Done!
+
+The CLI will use your existing login, so it's faster!
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║  NEXT: Double-click START_DEPLOYMENT.bat in your project folder!        ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
