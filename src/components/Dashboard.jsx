@@ -5,6 +5,9 @@ import { LogOut, Settings, User } from 'lucide-react';
 import ReportCard from './ReportCard';
 import ReportManager from './ReportManager';
 import reportsConfig from '../config/reports.json';
+import { getReports, saveReports, subscribeToReports, initializeReports } from '../utils/reportsService';
+import '../utils/debugSync'; // Load debug tools
+import '../utils/initFirestore'; // Load Firestore init tool
 import Logo from './Logo';
 
 const Dashboard = ({ userEmail, onLogout }) => {
@@ -20,16 +23,39 @@ const Dashboard = ({ userEmail, onLogout }) => {
     setUserRole(role);
     setUserInfo(info);
     
-    // Load reports from localStorage if available, otherwise use default
-    const savedReports = localStorage.getItem('bi-reports');
-    if (savedReports) {
+    // Initialize and migrate reports to Firestore
+    const setupReports = async () => {
       try {
-        const parsed = JSON.parse(savedReports);
-        setReports(parsed);
-      } catch (e) {
-        console.error('Error loading saved reports:', e);
+        // Initialize reports in Firestore (migrates from localStorage if needed)
+        await initializeReports(reportsConfig.reports);
+        
+        // Load reports from Firestore
+        const firestoreReports = await getReports();
+        if (firestoreReports.length > 0) {
+          setReports(firestoreReports);
+        } else {
+          // If still empty, use defaults
+          setReports(reportsConfig.reports);
+        }
+      } catch (error) {
+        console.error('Error setting up reports:', error);
+        // Fallback to default reports
+        setReports(reportsConfig.reports);
       }
-    }
+    };
+    
+    setupReports();
+    
+    // Subscribe to real-time changes (syncs across all devices)
+    const unsubscribe = subscribeToReports((updatedReports) => {
+      console.log('🔄 Real-time update received:', updatedReports.length, 'reports');
+      console.log('📋 Report IDs:', updatedReports.map(r => r.id));
+      // Always update, even if empty (so deletions sync properly)
+      setReports(updatedReports);
+    });
+    
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, [userEmail]);
 
   useEffect(() => {
@@ -46,21 +72,24 @@ const Dashboard = ({ userEmail, onLogout }) => {
     }
   };
 
-  const handleAddReport = (newReport) => {
+  const handleAddReport = async (newReport) => {
     const updated = [...reports, newReport];
     setReports(updated);
-    localStorage.setItem('bi-reports', JSON.stringify(updated));
+    // Save to Firestore (syncs across all devices)
+    await saveReports(updated);
   };
 
-  const handleRemoveReport = (reportId) => {
+  const handleRemoveReport = async (reportId) => {
     const updated = reports.filter(r => r.id !== reportId);
     setReports(updated);
-    localStorage.setItem('bi-reports', JSON.stringify(updated));
+    // Save to Firestore (syncs across all devices)
+    await saveReports(updated);
   };
 
-  const handleUpdateReports = (updatedReports) => {
+  const handleUpdateReports = async (updatedReports) => {
     setReports(updatedReports);
-    localStorage.setItem('bi-reports', JSON.stringify(updatedReports));
+    // Save to Firestore (syncs across all devices)
+    await saveReports(updatedReports);
   };
 
   if (!userRole) {
