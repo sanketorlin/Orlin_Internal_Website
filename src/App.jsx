@@ -10,17 +10,22 @@ function App() {
 
   // Listen to Firebase auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChange((firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser.email);
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
+    try {
+      const unsubscribe = onAuthStateChange((firebaseUser) => {
+        if (firebaseUser) {
+          setUser(firebaseUser.email);
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      });
 
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
+      // Cleanup subscription on unmount
+      return () => unsubscribe();
+    } catch (error) {
+      console.error('Firebase auth error:', error);
+      setLoading(false);
+    }
   }, []);
 
   const handleLoginSuccess = (email) => {

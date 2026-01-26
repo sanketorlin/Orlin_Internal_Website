@@ -8,5 +8,11 @@ export default defineConfig({
     host: '0.0.0.0', // Listen on all network interfaces - allows network access
     open: true,
     strictPort: false
-  }
+  },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false
+  },
+  base: '/' // Ensure base path is correct for Vercel
 })
