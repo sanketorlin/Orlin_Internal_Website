@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { signOut } from '../utils/auth';
-import { getUserRole, getUserInfo, getReportsForRole } from '../utils/roles';
-import { LogOut, Settings, User } from 'lucide-react';
+import { getUserRole, getUserInfo, getReportsForRole, updateUsersCache } from '../utils/roles';
+import { LogOut, Settings, User, Users } from 'lucide-react';
 import ReportCard from './ReportCard';
 import ReportManager from './ReportManager';
+import UserManager from './UserManager';
 import reportsConfig from '../config/reports.json';
 import { getReports, saveReports, subscribeToReports, initializeReports } from '../utils/reportsService';
+import { getUsers, subscribeToUsers, initializeUsers } from '../utils/usersService';
 import '../utils/debugSync'; // Load debug tools
 import '../utils/initFirestore'; // Load Firestore init tool
 import Logo from './Logo';
@@ -15,13 +17,46 @@ const Dashboard = ({ userEmail, onLogout }) => {
   const [userRole, setUserRole] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [showManager, setShowManager] = useState(false);
+  const [showUserManager, setShowUserManager] = useState(false);
   const [filteredReports, setFilteredReports] = useState([]);
 
   useEffect(() => {
-    const role = getUserRole(userEmail);
-    const info = getUserInfo(userEmail);
-    setUserRole(role);
-    setUserInfo(info);
+    // Initialize users in Firestore
+    initializeUsers();
+    
+    // Load users and set up real-time listener
+    const setupUsers = async () => {
+      try {
+        const usersData = await getUsers();
+        updateUsersCache(usersData);
+        
+        // Get user role and info
+        const role = getUserRole(userEmail);
+        const info = getUserInfo(userEmail);
+        setUserRole(role);
+        setUserInfo(info);
+      } catch (error) {
+        console.error('Error loading users:', error);
+        // Fallback to users.json
+        const role = getUserRole(userEmail);
+        const info = getUserInfo(userEmail);
+        setUserRole(role);
+        setUserInfo(info);
+      }
+    };
+    
+    setupUsers();
+    
+    // Subscribe to real-time user changes
+    const unsubscribeUsers = subscribeToUsers((updatedUsers) => {
+      console.log('🔄 Users update received:', Object.keys(updatedUsers).length, 'users');
+      updateUsersCache(updatedUsers);
+      // Update current user info if it changed
+      const role = getUserRole(userEmail);
+      const info = getUserInfo(userEmail);
+      setUserRole(role);
+      setUserInfo(info);
+    });
     
     // Initialize and migrate reports to Firestore
     const setupReports = async () => {
@@ -54,8 +89,11 @@ const Dashboard = ({ userEmail, onLogout }) => {
       setReports(updatedReports);
     });
     
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
+    // Cleanup subscriptions on unmount
+    return () => {
+      unsubscribe();
+      unsubscribeUsers();
+    };
   }, [userEmail]);
 
   useEffect(() => {
@@ -155,19 +193,34 @@ const Dashboard = ({ userEmail, onLogout }) => {
         </div>
         <div className="header-right">
           {userRole === 'team-head' && (
-            <button
-              onClick={() => setShowManager(!showManager)}
-              className="btn-icon"
-              title="Manage Reports"
-            >
-              <Settings />
-            </button>
+            <>
+              <button
+                onClick={() => setShowUserManager(!showUserManager)}
+                className="btn-icon"
+                title="Manage Users"
+              >
+                <Users />
+              </button>
+              <button
+                onClick={() => setShowManager(!showManager)}
+                className="btn-icon"
+                title="Manage Reports"
+              >
+                <Settings />
+              </button>
+            </>
           )}
           <button onClick={handleLogout} className="btn-icon" title="Logout">
             <LogOut />
           </button>
         </div>
       </header>
+
+      {showUserManager && userRole === 'team-head' && (
+        <UserManager
+          onClose={() => setShowUserManager(false)}
+        />
+      )}
 
       {showManager && userRole === 'team-head' && (
         <ReportManager
