@@ -1,13 +1,19 @@
 import { useState } from 'react';
 import { Maximize2, X } from 'lucide-react';
 
-const ReportCard = ({ report }) => {
+const ReportCard = ({ report, onViewCategory, categoryDashboards }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(true);
 
   const handleOpenReport = () => {
-    setIsFullscreen(true);
-    setIframeLoading(true);
+    // If there are multiple dashboards in this category, show selector
+    if (categoryDashboards && categoryDashboards.length > 1) {
+      onViewCategory(report.category, categoryDashboards);
+    } else {
+      // If only one dashboard, open it directly
+      setIsFullscreen(true);
+      setIframeLoading(true);
+    }
   };
 
   const handleCloseReport = () => {

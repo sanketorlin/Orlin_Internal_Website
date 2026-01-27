@@ -1,0 +1,162 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║     🧪 TEST LOCALLY - Step by Step Guide                                 ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+I've started the dev server for you! Here's how to test:
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ STEP 1: Open Your Website                                                │
+└──────────────────────────────────────────────────────────────────────────┘
+
+1. Wait for the server to start (should see "Local: http://localhost:3000")
+2. Browser should open automatically
+3. OR manually go to: http://localhost:3000
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ STEP 2: Test as Super Admin                                              │
+└──────────────────────────────────────────────────────────────────────────┘
+
+TEST 1: Login
+─────────────
+1. Login with your Super Admin account (sanket8412@gmail.com)
+2. ✅ Should see dashboard with all reports grouped by category
+
+TEST 2: Check Dashboard Grouping
+─────────────────────────────────
+1. Look at the dashboard page
+2. ✅ Should see sections like:
+   - "Sales Dashboards (X dashboards)"
+   - "Finance Dashboards (X dashboards)"
+   - "HR Dashboards (X dashboards)"
+   - "Marketing Dashboards (X dashboards)"
+
+TEST 3: Add Multiple Dashboards for Sales
+───────────────────────────────────────────
+1. Click ⚙️ Settings icon (top right)
+2. Click "Add New Report"
+3. Fill in:
+   - Title: "Sales Report 2"
+   - Description: "Additional sales analytics"
+   - URL: https://example.com/sales2
+   - Category: "Sales" (IMPORTANT!)
+   - Allowed Roles: Select "Sales" and "Team Head"
+   - Icon: 📊
+4. Click "Add Report"
+5. ✅ New dashboard added!
+
+6. Add another one:
+   - Title: "Sales Analytics"
+   - Category: "Sales"
+   - Allowed Roles: "Sales" and "Team Head"
+7. ✅ Should now see 2+ Sales dashboards
+
+TEST 4: Check User Management
+───────────────────────────────
+1. Click 👥 Users icon (top right)
+2. Click "Add New User"
+3. Fill in:
+   - Email: test@example.com
+   - Name: Test User
+   - Role: Sales
+   - Password: test123
+   - Confirm Password: test123
+4. Click "Add User"
+5. ✅ User created with password shown in alert
+
+TEST 5: Test Password Reset
+─────────────────────────────
+1. In User Manager, find the user you created
+2. Click 🔒 icon (yellow lock)
+3. Confirm sending email
+4. ✅ Should see "Password reset email sent" message
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ STEP 3: Test as Regular User (Sales)                                     │
+└──────────────────────────────────────────────────────────────────────────┘
+
+TEST 1: Login as Sales User
+───────────────────────────
+1. Logout from Super Admin
+2. Login with the test user you created:
+   - Email: test@example.com
+   - Password: test123
+3. ✅ Should login successfully
+
+TEST 2: Check Dashboard View
+─────────────────────────────
+1. Should see "Sales Dashboards" section
+2. ✅ Should see all Sales dashboards you added
+3. ✅ Should NOT see Settings icon (only Super Admin can see it)
+4. ✅ Should see message: "Only Super Admin can add or edit dashboards"
+
+TEST 3: Verify Access Control
+──────────────────────────────
+1. Should only see Sales dashboards
+2. Should NOT see Finance, HR, or Marketing dashboards
+3. ✅ Access control working correctly!
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ STEP 4: Check Browser Console                                            │
+└──────────────────────────────────────────────────────────────────────────┘
+
+1. Press F12 to open Developer Tools
+2. Click "Console" tab
+3. Look for:
+   ✅ Success messages (green):
+      - "✅ Firebase Auth user created"
+      - "Saved users to Firestore"
+      - "Real-time update received"
+   
+   ❌ Errors (red):
+      - If you see red errors, note them down
+      - Fix before pushing
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ STEP 5: Test Real-Time Sync (If You Have 2 Browsers)                     │
+└──────────────────────────────────────────────────────────────────────────┘
+
+1. Open website in Browser 1 (Super Admin)
+2. Open website in Browser 2 (Incognito/Private - Sales user)
+3. In Browser 1: Add a new Sales dashboard
+4. Wait 3-5 seconds
+5. In Browser 2: Refresh page
+6. ✅ New dashboard should appear automatically!
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ ✅ CHECKLIST - Before Pushing                                            │
+└──────────────────────────────────────────────────────────────────────────┘
+
+[ ] Login as Super Admin works
+[ ] Dashboard grouping by category works
+[ ] Can add multiple dashboards for each role
+[ ] User Management works (add user with password)
+[ ] Password reset email sends
+[ ] Login as regular user works
+[ ] Regular user sees only their role's dashboards
+[ ] Regular user cannot see Settings icon
+[ ] No console errors
+[ ] Real-time sync works (if tested)
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ 🚨 IF YOU FIND ERRORS                                                    │
+└──────────────────────────────────────────────────────────────────────────┘
+
+1. Check browser console (F12) for error messages
+2. Check if Firestore is enabled
+3. Check if Firebase Auth is working
+4. Fix errors before pushing
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ ✅ IF EVERYTHING WORKS                                                   │
+└──────────────────────────────────────────────────────────────────────────┘
+
+1. Stop server: Press Ctrl+C in terminal
+2. Review changes: git status
+3. Commit: git add . && git commit -m "Add: Role-based multiple dashboards"
+4. Push: git push
+5. Deploy to Vercel (auto or manual)
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║  Server is starting! Open http://localhost:3000 and start testing!      ║
+╚══════════════════════════════════════════════════════════════════════════╝
+

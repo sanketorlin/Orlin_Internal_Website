@@ -1,0 +1,30 @@
+🚨 QUICK FIX: Firestore Security Rules
+
+The "Missing or insufficient permissions" error means Firestore is blocking access.
+
+✅ QUICK FIX (2 minutes):
+
+1. Go to: https://console.firebase.google.com/
+2. Select project: studio-4992265935-9ecf3
+3. Click: Firestore Database → Rules tab
+4. Replace ALL rules with this:
+
+---
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+---
+
+5. Click "Publish" button
+6. Refresh your browser
+7. Try login again
+
+✅ DONE! Error should be fixed.
+
+For more secure rules, see: FIRESTORE_SECURITY_RULES_SETUP.md
+

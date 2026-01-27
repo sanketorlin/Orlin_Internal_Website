@@ -95,25 +95,46 @@ export const signUp = async (email, password, name) => {
 // Send password reset email
 export const resetPassword = async (email) => {
   try {
-    await sendPasswordResetEmail(auth, email);
+    console.log('🔄 Attempting to send password reset email to:', email);
+    
+    // Validate email format first
+    if (!email || !email.includes('@')) {
+      throw new Error('Invalid email address.');
+    }
+    
+    await sendPasswordResetEmail(auth, email, {
+      // Optional: You can customize the email action handler URL
+      url: window.location.origin + '/login',
+      handleCodeInApp: false
+    });
+    
+    console.log('✅ Password reset email sent successfully to:', email);
     return true;
   } catch (error) {
-    console.error('Error sending password reset:', error);
+    console.error('❌ Error sending password reset:', error);
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
     
     let errorMessage = 'Failed to send password reset email.';
     
     switch (error.code) {
       case 'auth/user-not-found':
-        errorMessage = 'No account found with this email.';
+        errorMessage = 'No account found with this email address. Please check if the email is correct or contact administrator.';
         break;
       case 'auth/invalid-email':
-        errorMessage = 'Invalid email address.';
+        errorMessage = 'Invalid email address format. Please enter a valid email.';
         break;
       case 'auth/network-request-failed':
-        errorMessage = 'Network error. Please check your connection.';
+        errorMessage = 'Network error. Please check your internet connection and try again.';
+        break;
+      case 'auth/too-many-requests':
+        errorMessage = 'Too many password reset requests. Please wait a few minutes and try again.';
+        break;
+      case 'auth/quota-exceeded':
+        errorMessage = 'Email quota exceeded. Please contact administrator or try again later.';
         break;
       default:
-        errorMessage = error.message || 'Failed to send password reset email.';
+        errorMessage = error.message || 'Failed to send password reset email. Please check Firebase Console email settings.';
     }
     
     throw new Error(errorMessage);

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Save, Edit2, User, Mail, Shield } from 'lucide-react';
+import { X, Plus, Trash2, Save, Edit2, User, Mail, Shield, Lock } from 'lucide-react';
 import { getUsers, addUser, updateUser, deleteUser, subscribeToUsers } from '../utils/usersService';
+import { createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../firebase/config';
 
 const UserManager = ({ onClose }) => {
   const [users, setUsers] = useState({});
@@ -9,7 +11,9 @@ const UserManager = ({ onClose }) => {
   const [formData, setFormData] = useState({
     email: '',
     name: '',
-    role: 'sales'
+    role: 'sales',
+    password: '',
+    confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -48,7 +52,9 @@ const UserManager = ({ onClose }) => {
     setFormData({
       email: '',
       name: '',
-      role: 'sales'
+      role: 'sales',
+      password: '',
+      confirmPassword: ''
     });
     setEditingUser(null);
     setShowAddForm(false);
@@ -60,7 +66,9 @@ const UserManager = ({ onClose }) => {
     setFormData({
       email: user.email,
       name: user.name || '',
-      role: user.role || 'sales'
+      role: user.role || 'sales',
+      password: '',
+      confirmPassword: ''
     });
     setEditingUser(email);
     setShowAddForm(true);
@@ -88,19 +96,58 @@ const UserManager = ({ onClose }) => {
       }
 
       if (editingUser) {
-        // Update existing user
+        // Update existing user (no password change)
         await updateUser(editingUser, {
           name: formData.name.trim(),
           role: formData.role
         });
         alert('✅ User updated successfully!');
       } else {
-        // Add new user
+        // Add new user - validate password
+        if (!formData.password || formData.password.length < 6) {
+          setError('Password must be at least 6 characters');
+          setLoading(false);
+          return;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+          setError('Passwords do not match');
+          setLoading(false);
+          return;
+        }
+
+        // Create Firebase Auth user first
+        try {
+          await createUserWithEmailAndPassword(
+            auth,
+            formData.email.toLowerCase().trim(),
+            formData.password
+          );
+          console.log('✅ Firebase Auth user created');
+        } catch (authError) {
+          if (authError.code === 'auth/email-already-in-use') {
+            setError('This email is already registered. User can login with existing password.');
+            setLoading(false);
+            return;
+          }
+          throw authError;
+        }
+
+        // Then add to Firestore for role management
         await addUser(formData.email.toLowerCase().trim(), {
           name: formData.name.trim(),
           role: formData.role
         });
-        alert('✅ User added successfully!');
+        
+        const userEmail = formData.email.toLowerCase().trim();
+        const userPassword = formData.password;
+        
+        alert('✅ User added successfully!\n\n' +
+              'Email: ' + userEmail + '\n' +
+              'Password: ' + userPassword + '\n\n' +
+              '⚠️ IMPORTANT: Save this password!\n' +
+              'User can now login with these credentials.\n\n' +
+              'You can also send a password reset email later using the 🔒 icon.');
       }
 
       resetForm();
@@ -126,6 +173,31 @@ const UserManager = ({ onClose }) => {
     }
   };
 
+  const handleResetPassword = async (email) => {
+    if (!confirm(`Send password reset email to "${email}"?`)) {
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert('✅ Password reset email sent!\n\nPlease check the inbox (and spam folder) for: ' + email);
+    } catch (error) {
+      console.error('Error sending password reset:', error);
+      let errorMsg = 'Failed to send password reset email.';
+      if (error.code === 'auth/user-not-found') {
+        errorMsg = 'User not found in Firebase Authentication. User needs to be created first.';
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+      alert('❌ ' + errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const usersList = Object.values(users);
 
   return (
@@ -137,7 +209,7 @@ const UserManager = ({ onClose }) => {
               <User style={{ marginRight: '8px', display: 'inline' }} />
               User Management
             </h2>
-            <p style={{ marginTop: '4px', color: 'rgba(0,0,0,0.6)', fontSize: '14px' }}>
+            <p style={{ marginTop: '4px', color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}>
               Manage users and their access roles. Changes sync automatically across all devices.
             </p>
           </div>
@@ -149,19 +221,20 @@ const UserManager = ({ onClose }) => {
         <div className="report-manager-content">
           {error && (
             <div style={{
-              background: '#fee',
-              color: '#c33',
+              background: 'linear-gradient(135deg, rgba(198, 40, 40, 0.2) 0%, rgba(211, 47, 47, 0.15) 100%)',
+              color: '#ff6b6b',
               padding: '12px',
               borderRadius: '8px',
               marginBottom: '16px',
-              border: '1px solid #fcc'
+              border: '1px solid rgba(255, 107, 107, 0.3)',
+              backdropFilter: 'blur(10px)'
             }}>
               {error}
             </div>
           )}
 
           <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
+            <div style={{ color: 'rgba(255,255,255,0.9)' }}>
               <strong>{usersList.length}</strong> user{usersList.length !== 1 ? 's' : ''} registered
             </div>
             <button
@@ -175,13 +248,13 @@ const UserManager = ({ onClose }) => {
           </div>
 
           {showAddForm && (
-            <div className="add-report-form" style={{ marginBottom: '24px', padding: '20px', background: '#f5f5f5', borderRadius: '8px' }}>
-              <h3 style={{ marginBottom: '16px' }}>
+            <div className="add-report-form" style={{ marginBottom: '24px', padding: '20px' }}>
+              <h3 style={{ marginBottom: '16px', color: '#ffffff' }}>
                 {editingUser ? 'Edit User' : 'Add New User'}
               </h3>
               <form onSubmit={handleSubmit}>
                 <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500' }}>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', color: 'rgba(255,255,255,0.9)' }}>
                     <Mail size={14} style={{ display: 'inline', marginRight: '4px' }} />
                     Email Address *
                   </label>
@@ -194,21 +267,24 @@ const UserManager = ({ onClose }) => {
                     style={{
                       width: '100%',
                       padding: '10px',
-                      border: '1px solid #ddd',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
                       borderRadius: '6px',
-                      fontSize: '14px'
+                      fontSize: '14px',
+                      background: 'rgba(13, 17, 23, 0.6)',
+                      color: '#ffffff',
+                      backdropFilter: 'blur(10px)'
                     }}
                     placeholder="user@example.com"
                   />
                   {editingUser && (
-                    <small style={{ color: '#666', marginTop: '4px', display: 'block' }}>
+                    <small style={{ color: 'rgba(255,255,255,0.6)', marginTop: '4px', display: 'block' }}>
                       Email cannot be changed
                     </small>
                   )}
                 </div>
 
                 <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500' }}>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', color: 'rgba(255,255,255,0.9)' }}>
                     <User size={14} style={{ display: 'inline', marginRight: '4px' }} />
                     Full Name *
                   </label>
@@ -220,16 +296,19 @@ const UserManager = ({ onClose }) => {
                     style={{
                       width: '100%',
                       padding: '10px',
-                      border: '1px solid #ddd',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
                       borderRadius: '6px',
-                      fontSize: '14px'
+                      fontSize: '14px',
+                      background: 'rgba(13, 17, 23, 0.6)',
+                      color: '#ffffff',
+                      backdropFilter: 'blur(10px)'
                     }}
                     placeholder="John Doe"
                   />
                 </div>
 
                 <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500' }}>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', color: 'rgba(255,255,255,0.9)' }}>
                     <Shield size={14} style={{ display: 'inline', marginRight: '4px' }} />
                     Role *
                   </label>
@@ -240,10 +319,12 @@ const UserManager = ({ onClose }) => {
                     style={{
                       width: '100%',
                       padding: '10px',
-                      border: '1px solid #ddd',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
                       borderRadius: '6px',
                       fontSize: '14px',
-                      background: 'white'
+                      background: 'rgba(13, 17, 23, 0.6)',
+                      color: '#ffffff',
+                      backdropFilter: 'blur(10px)'
                     }}
                   >
                     {roles.map(role => (
@@ -253,6 +334,62 @@ const UserManager = ({ onClose }) => {
                     ))}
                   </select>
                 </div>
+
+                {!editingUser && (
+                  <>
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', color: 'rgba(255,255,255,0.9)' }}>
+                        <Lock size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                        Password *
+                      </label>
+                      <input
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        required={!editingUser}
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                          background: 'rgba(13, 17, 23, 0.6)',
+                          color: '#ffffff',
+                          backdropFilter: 'blur(10px)'
+                        }}
+                        placeholder="Minimum 6 characters"
+                        minLength={6}
+                      />
+                      <small style={{ color: 'rgba(255,255,255,0.6)', marginTop: '4px', display: 'block' }}>
+                        Password must be at least 6 characters
+                      </small>
+                    </div>
+
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', color: 'rgba(255,255,255,0.9)' }}>
+                        <Lock size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                        Confirm Password *
+                      </label>
+                      <input
+                        type="password"
+                        value={formData.confirmPassword}
+                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                        required={!editingUser}
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                          background: 'rgba(13, 17, 23, 0.6)',
+                          color: '#ffffff',
+                          backdropFilter: 'blur(10px)'
+                        }}
+                        placeholder="Re-enter password"
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button
@@ -278,10 +415,10 @@ const UserManager = ({ onClose }) => {
           )}
 
           <div className="reports-list">
-            <h3 style={{ marginBottom: '16px' }}>All Users</h3>
+            <h3 style={{ marginBottom: '16px', color: '#ffffff' }}>All Users</h3>
             {usersList.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-                <User size={48} style={{ marginBottom: '16px', opacity: 0.3 }} />
+              <div style={{ textAlign: 'center', padding: '40px', color: 'rgba(255,255,255,0.7)' }}>
+                <User size={48} style={{ marginBottom: '16px', opacity: 0.3, color: 'rgba(255,255,255,0.3)' }} />
                 <p>No users found. Add your first user above.</p>
               </div>
             ) : (
@@ -290,13 +427,15 @@ const UserManager = ({ onClose }) => {
                   <div
                     key={user.email}
                     style={{
-                      background: 'white',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '8px',
+                      background: 'linear-gradient(135deg, rgba(22, 27, 34, 0.9) 0%, rgba(13, 17, 23, 0.95) 100%)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '12px',
                       padding: '16px',
                       display: 'flex',
                       justifyContent: 'space-between',
-                      alignItems: 'center'
+                      alignItems: 'center',
+                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
+                      backdropFilter: 'blur(10px)'
                     }}
                   >
                     <div style={{ flex: 1 }}>
@@ -305,21 +444,22 @@ const UserManager = ({ onClose }) => {
                           width: '40px',
                           height: '40px',
                           borderRadius: '50%',
-                          background: '#4a90e2',
+                          background: 'linear-gradient(135deg, #4a90e2 0%, #5c6bc0 100%)',
                           color: 'white',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontWeight: 'bold',
-                          fontSize: '16px'
+                          fontSize: '16px',
+                          boxShadow: '0 4px 12px rgba(74, 144, 226, 0.3)'
                         }}>
                           {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <div style={{ fontWeight: '600', fontSize: '16px' }}>
+                          <div style={{ fontWeight: '600', fontSize: '16px', color: '#ffffff' }}>
                             {user.name || 'No name'}
                           </div>
-                          <div style={{ color: '#666', fontSize: '14px' }}>
+                          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}>
                             {user.email}
                           </div>
                         </div>
@@ -327,12 +467,13 @@ const UserManager = ({ onClose }) => {
                       <div style={{
                         display: 'inline-block',
                         padding: '4px 12px',
-                        background: '#e3f2fd',
-                        color: '#1976d2',
+                        background: 'linear-gradient(135deg, rgba(74, 144, 226, 0.2) 0%, rgba(92, 107, 192, 0.2) 100%)',
+                        color: '#4a90e2',
                         borderRadius: '12px',
                         fontSize: '12px',
                         fontWeight: '500',
-                        textTransform: 'uppercase'
+                        textTransform: 'uppercase',
+                        border: '1px solid rgba(74, 144, 226, 0.3)'
                       }}>
                         {user.role || 'sales'}
                       </div>
@@ -345,6 +486,15 @@ const UserManager = ({ onClose }) => {
                         style={{ color: '#4a90e2' }}
                       >
                         <Edit2 size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleResetPassword(user.email)}
+                        className="btn-icon"
+                        title="Send Password Reset Email"
+                        style={{ color: '#f39c12' }}
+                        disabled={loading}
+                      >
+                        <Lock size={18} />
                       </button>
                       <button
                         onClick={() => handleDelete(user.email)}

@@ -5,6 +5,8 @@ import { LogOut, Settings, User, Users } from 'lucide-react';
 import ReportCard from './ReportCard';
 import ReportManager from './ReportManager';
 import UserManager from './UserManager';
+import DashboardSelector from './DashboardSelector';
+import CategoryCard from './CategoryCard';
 import reportsConfig from '../config/reports.json';
 import { getReports, saveReports, subscribeToReports, initializeReports } from '../utils/reportsService';
 import { getUsers, subscribeToUsers, initializeUsers } from '../utils/usersService';
@@ -19,6 +21,19 @@ const Dashboard = ({ userEmail, onLogout }) => {
   const [showManager, setShowManager] = useState(false);
   const [showUserManager, setShowUserManager] = useState(false);
   const [filteredReports, setFilteredReports] = useState([]);
+  const [showDashboardSelector, setShowDashboardSelector] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategoryDashboards, setSelectedCategoryDashboards] = useState([]);
+  
+  // Group reports by category/role for better organization
+  const groupedReports = filteredReports.reduce((acc, report) => {
+    const category = report.category || 'Other';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(report);
+    return acc;
+  }, {});
 
   useEffect(() => {
     // Initialize users in Firestore
@@ -130,6 +145,12 @@ const Dashboard = ({ userEmail, onLogout }) => {
     await saveReports(updatedReports);
   };
 
+  const handleViewCategory = (category, dashboards) => {
+    setSelectedCategory(category);
+    setSelectedCategoryDashboards(dashboards);
+    setShowDashboardSelector(true);
+  };
+
   if (!userRole) {
     return (
       <div className="loading" style={{ 
@@ -222,6 +243,18 @@ const Dashboard = ({ userEmail, onLogout }) => {
         />
       )}
 
+      {showDashboardSelector && (
+        <DashboardSelector
+          category={selectedCategory}
+          dashboards={selectedCategoryDashboards}
+          onClose={() => {
+            setShowDashboardSelector(false);
+            setSelectedCategory(null);
+            setSelectedCategoryDashboards([]);
+          }}
+        />
+      )}
+
       {showManager && userRole === 'team-head' && (
         <ReportManager
           reports={reports}
@@ -237,18 +270,39 @@ const Dashboard = ({ userEmail, onLogout }) => {
           <div className="reports-header">
             <h2>Your Dashboards</h2>
             <p className="reports-count">
-              {filteredReports.length} report{filteredReports.length !== 1 ? 's' : ''} available
+              {filteredReports.length} dashboard{filteredReports.length !== 1 ? 's' : ''} available
+              {userRole !== 'team-head' && (
+                <span style={{ 
+                  display: 'block', 
+                  fontSize: '14px', 
+                  color: 'rgba(0,0,0,0.6)', 
+                  marginTop: '4px',
+                  fontWeight: 'normal'
+                }}>
+                  (Only Super Admin can add or edit dashboards)
+                </span>
+              )}
             </p>
           </div>
 
           {filteredReports.length === 0 ? (
             <div className="empty-state">
-              <p>No reports available for your role.</p>
+              <p>No dashboards available for your role.</p>
+              {userRole !== 'team-head' && (
+                <p style={{ marginTop: '8px', fontSize: '14px', color: 'rgba(0,0,0,0.6)' }}>
+                  Contact Super Admin to add dashboards for your role.
+                </p>
+              )}
             </div>
           ) : (
             <div className="reports-grid">
-              {filteredReports.map((report) => (
-                <ReportCard key={report.id} report={report} />
+              {Object.keys(groupedReports).map((category) => (
+                <CategoryCard
+                  key={category}
+                  category={category}
+                  dashboards={groupedReports[category]}
+                  onViewCategory={handleViewCategory}
+                />
               ))}
             </div>
           )}

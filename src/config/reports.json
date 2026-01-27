@@ -16,7 +16,7 @@
       "description": "Financial overview and budget analysis",
       "url": "https://example.com/finance-dashboard",
       "iframe": true,
-      "allowedRoles": ["team-head"],
+      "allowedRoles": ["team-head", "finance"],
       "icon": "💰",
       "category": "Finance"
     },
@@ -26,7 +26,7 @@
       "description": "Human resources metrics and employee analytics",
       "url": "https://example.com/hr-dashboard",
       "iframe": true,
-      "allowedRoles": ["team-head"],
+      "allowedRoles": ["team-head", "hr"],
       "icon": "👥",
       "category": "HR"
     },
@@ -36,7 +36,7 @@
       "description": "Marketing campaigns and performance tracking",
       "url": "https://example.com/marketing-dashboard",
       "iframe": true,
-      "allowedRoles": ["team-head"],
+      "allowedRoles": ["team-head", "marketing"],
       "icon": "📈",
       "category": "Marketing"
     }

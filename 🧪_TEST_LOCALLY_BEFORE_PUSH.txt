@@ -1,0 +1,130 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║     🧪 TEST LOCALLY BEFORE PUSHING TO GITHUB                              ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+Always test your changes locally before pushing to GitHub and deploying!
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ STEP 1: Start Development Server                                         │
+└──────────────────────────────────────────────────────────────────────────┘
+
+1. Open terminal in your project folder
+2. Make sure you're in the right directory:
+   cd "C:\Users\sanke\OneDrive\Desktop\Work Flow Analysis Web"
+
+3. Start the dev server:
+   npm run dev
+
+4. Wait for: "Local: http://localhost:3000"
+5. Website should open automatically in browser
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ STEP 2: Test the New Features                                            │
+└──────────────────────────────────────────────────────────────────────────┘
+
+TEST 1: Login as Super Admin
+─────────────────────────────
+1. Go to: http://localhost:3000
+2. Login with your Super Admin account
+3. ✅ Should login successfully
+
+TEST 2: Add New User with Password
+───────────────────────────────────
+1. Click 👥 Users icon (top right)
+2. Click "Add New User"
+3. Fill in:
+   - Email: test@example.com
+   - Name: Test User
+   - Role: Sales
+   - Password: test123
+   - Confirm Password: test123
+4. Click "Add User"
+5. ✅ Should see success message with password
+6. ✅ User should appear in the list
+
+TEST 3: Test Password Reset Email
+──────────────────────────────────
+1. In User Manager, find the user you just created
+2. Click the 🔒 icon (yellow lock)
+3. Confirm sending email
+4. ✅ Should see "Password reset email sent" message
+5. Check email inbox (and spam folder)
+
+TEST 4: Login with New User
+────────────────────────────
+1. Logout from Super Admin
+2. Try to login with:
+   - Email: test@example.com
+   - Password: test123
+3. ✅ Should login successfully
+4. ✅ Should see dashboard based on role
+
+TEST 5: Check Browser Console
+──────────────────────────────
+1. Press F12 to open Developer Tools
+2. Click "Console" tab
+3. Look for any errors (red messages)
+4. ✅ Should see success messages:
+   - "✅ Firebase Auth user created"
+   - "Saved users to Firestore"
+   - "Real-time update received"
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ STEP 3: Check for Errors                                                 │
+└──────────────────────────────────────────────────────────────────────────┘
+
+COMMON ERRORS TO CHECK:
+───────────────────────
+
+1. ❌ "Firebase Auth user creation failed"
+   → Check Firebase Authentication is enabled
+   → Check email format is valid
+
+2. ❌ "Failed to save to Firestore"
+   → Check Firestore is enabled
+   → Check Firestore security rules allow authenticated users
+
+3. ❌ "User not found in Firebase Authentication"
+   → User needs to be created first via User Manager
+
+4. ❌ Console errors (red messages)
+   → Check browser console (F12)
+   → Fix any JavaScript errors before pushing
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ STEP 4: Test All Features Work                                           │
+└──────────────────────────────────────────────────────────────────────────┘
+
+✅ Login works
+✅ Add user with password works
+✅ Password reset email sends
+✅ New user can login
+✅ User roles work correctly
+✅ Reports sync across devices
+✅ No console errors
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ STEP 5: If Everything Works - Push to GitHub                            │
+└──────────────────────────────────────────────────────────────────────────┘
+
+Once all tests pass:
+
+1. Stop dev server (Ctrl+C)
+2. Review changes:
+   git status
+   git diff --stat
+
+3. Commit changes:
+   git add .
+   git commit -m "Add: Password creation and reset email features"
+
+4. Push to GitHub:
+   git push
+
+5. Vercel will auto-deploy (if connected)
+   OR manually deploy from Vercel dashboard
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║  TIP: Always test locally first! It's faster than deploying each time.   ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
