@@ -119,6 +119,9 @@ const Dashboard = ({ userEmail, onLogout }) => {
   const handleLogout = async () => {
     try {
       await signOut();
+      // Clear device trust on logout (optional - comment out if you want to keep devices trusted)
+      // This ensures users need to verify OTP again after logout
+      // localStorage.removeItem(`trusted_device_${userEmail.toLowerCase()}`);
       onLogout();
     } catch (error) {
       console.error('Logout error:', error);
