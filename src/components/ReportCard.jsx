@@ -23,51 +23,80 @@ const ReportCard = ({ report, onViewCategory, categoryDashboards }) => {
   if (isFullscreen) {
     return (
       <div className="report-fullscreen">
-        <div className="report-fullscreen-header" style={{
-          background: 'linear-gradient(135deg, rgba(13, 17, 23, 0.95) 0%, rgba(22, 27, 34, 0.98) 100%)',
-          backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-          padding: '16px 24px'
+        {/* Floating buttons without header bar */}
+        <div style={{
+          position: 'fixed',
+          top: '16px',
+          left: '16px',
+          zIndex: 1001
         }}>
-          <h2 style={{
-            color: '#ffffff',
-            fontSize: '20px',
-            fontWeight: '600',
-            margin: 0,
-            textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)'
-          }}>{report.title}</h2>
-          <div className="report-actions">
-            <button 
-              onClick={handleCloseReport} 
-              className="btn-close-fullscreen"
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#ffffff',
-                padding: '8px 16px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                transition: 'all 0.3s ease',
-                backdropFilter: 'blur(10px)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              <X size={18} /> Close
-            </button>
-          </div>
+          <button 
+            onClick={handleCloseReport}
+            style={{
+              background: 'rgba(13, 17, 23, 0.9)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              color: '#ffffff',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.3s ease',
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(22, 27, 34, 0.95)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(13, 17, 23, 0.9)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            ← Back
+          </button>
+        </div>
+        <div style={{
+          position: 'fixed',
+          top: '16px',
+          right: '16px',
+          zIndex: 1001
+        }}>
+          <button 
+            onClick={handleCloseReport} 
+            style={{
+              background: 'rgba(13, 17, 23, 0.9)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              color: '#ffffff',
+              padding: '8px',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.3s ease',
+              backdropFilter: 'blur(10px)',
+              width: '36px',
+              height: '36px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(22, 27, 34, 0.95)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(13, 17, 23, 0.9)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <X size={18} />
+          </button>
         </div>
         <div className="report-fullscreen-content" style={{
           background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1419 100%)',

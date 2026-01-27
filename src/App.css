@@ -721,7 +721,7 @@
 }
 
 .report-fullscreen-header {
-  padding: 20px 40px;
+  padding: 12px 24px;
   background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
@@ -729,6 +729,7 @@
   align-items: center;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(20px);
+  min-height: auto;
 }
 
 .report-fullscreen-header h2 {

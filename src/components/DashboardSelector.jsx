@@ -20,83 +20,81 @@ const DashboardSelector = ({ category, dashboards, onClose, onSelectDashboard })
   if (selectedDashboard) {
     return (
       <div className="report-fullscreen">
-        <div className="report-fullscreen-header" style={{ 
-          background: 'linear-gradient(135deg, rgba(13, 17, 23, 0.95) 0%, rgba(22, 27, 34, 0.98) 100%)',
-          backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-          padding: '16px 24px',
-          minHeight: 'auto'
+        {/* Floating buttons without header bar */}
+        <div style={{
+          position: 'fixed',
+          top: '16px',
+          left: '16px',
+          zIndex: 1001
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button
-              onClick={() => setSelectedDashboard(null)}
-              className="btn-icon"
-              style={{ 
-                color: '#ffffff',
-                padding: '8px 16px',
-                fontSize: '14px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                backdropFilter: 'blur(10px)',
-                fontWeight: '600'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-              title="Back to Dashboard List"
-            >
-              ← Back
-            </button>
-            <h2 style={{ 
-              fontSize: '20px', 
-              fontWeight: '600',
-              margin: 0,
+          <button
+            onClick={() => setSelectedDashboard(null)}
+            style={{ 
               color: '#ffffff',
-              textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)'
-            }}>
-              {selectedDashboard.title}
-            </h2>
-          </div>
-          <div className="report-actions">
-            <button 
-              onClick={handleClose} 
-              className="btn-icon"
-              style={{ 
-                padding: '8px',
-                fontSize: '14px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '8px',
-                color: '#ffffff',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                backdropFilter: 'blur(10px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-              title="Close"
-            >
-              <X size={18} />
-            </button>
-          </div>
+              padding: '8px 16px',
+              fontSize: '14px',
+              background: 'rgba(13, 17, 23, 0.9)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              backdropFilter: 'blur(10px)',
+              fontWeight: '600',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(22, 27, 34, 0.95)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(13, 17, 23, 0.9)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+            title="Back to Dashboard List"
+          >
+            ← Back
+          </button>
+        </div>
+        <div style={{
+          position: 'fixed',
+          top: '16px',
+          right: '16px',
+          zIndex: 1001
+        }}>
+          <button 
+            onClick={handleClose} 
+            style={{ 
+              padding: '8px',
+              fontSize: '14px',
+              background: 'rgba(13, 17, 23, 0.9)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '8px',
+              color: '#ffffff',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              backdropFilter: 'blur(10px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '36px',
+              height: '36px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(22, 27, 34, 0.95)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(13, 17, 23, 0.9)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+            title="Close"
+          >
+            <X size={18} />
+          </button>
         </div>
         <div className="report-fullscreen-content" style={{
           background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1419 100%)',
