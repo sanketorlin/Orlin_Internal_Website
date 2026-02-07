@@ -28,3 +28,5 @@ service cloud.firestore {
 
 For more secure rules, see: FIRESTORE_SECURITY_RULES_SETUP.md
 
+
+

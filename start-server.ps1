@@ -23,3 +23,5 @@ Write-Host "Browser should open automatically." -ForegroundColor Green
 Write-Host ""
 Write-Host "If the browser doesn't open, go to: http://localhost:3000" -ForegroundColor Yellow
 
+
+

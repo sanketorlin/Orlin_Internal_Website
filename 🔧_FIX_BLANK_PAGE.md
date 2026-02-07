@@ -130,3 +130,5 @@ I've updated the `vercel.json` configuration to the correct format for Vite.
 
 The `vercel.json` was using old format. I've updated it. Just **redeploy** and it should work!
 
+
+

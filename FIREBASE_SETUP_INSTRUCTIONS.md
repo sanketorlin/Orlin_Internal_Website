@@ -176,3 +176,5 @@ If you want to switch back to local authentication:
 
 Once you complete the setup steps above, Firebase authentication will work perfectly!
 
+
+

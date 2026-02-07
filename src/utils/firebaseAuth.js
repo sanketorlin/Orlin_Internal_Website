@@ -27,22 +27,25 @@ export const signIn = async (email, password) => {
     
     switch (error.code) {
       case 'auth/user-not-found':
-        errorMessage = 'No account found with this email.';
+        errorMessage = 'No account found with this email. Please check your email or create an account.';
         break;
       case 'auth/wrong-password':
-        errorMessage = 'Incorrect password.';
+        errorMessage = 'Incorrect password. Please try again or use "Forgot Password?" to reset.';
+        break;
+      case 'auth/invalid-credential':
+        errorMessage = 'Invalid email or password. Please check:\n\n• Email address is correct\n• Password is correct\n• User exists in Firebase Authentication\n\n💡 Tip: If this worked on another laptop, the user account might not exist in Firebase. Create the user in Firebase Console first.';
         break;
       case 'auth/invalid-email':
-        errorMessage = 'Invalid email address.';
+        errorMessage = 'Invalid email address. Please enter a valid email.';
         break;
       case 'auth/user-disabled':
-        errorMessage = 'This account has been disabled.';
+        errorMessage = 'This account has been disabled. Please contact administrator.';
         break;
       case 'auth/too-many-requests':
         errorMessage = 'Too many failed attempts. Please try again later.';
         break;
       case 'auth/network-request-failed':
-        errorMessage = 'Network error. Please check your connection.';
+        errorMessage = 'Network error. Please check your internet connection.';
         break;
       default:
         errorMessage = error.message || 'Login failed. Please try again.';

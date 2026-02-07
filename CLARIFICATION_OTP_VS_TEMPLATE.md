@@ -122,3 +122,5 @@ This doesn't mean you're manually creating OTP - it means you're telling EmailJS
 
 The OTP will still be generated automatically - you're just telling EmailJS where to display it in the email!
 
+
+

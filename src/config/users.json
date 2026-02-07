@@ -1,5 +1,15 @@
 {
   "users": {
+    "orlin.komal@gmail.com": {
+      "email": "orlin.komal@gmail.com",
+      "role": "team-head",
+      "name": "Komal"
+    },
+    "orlinadmin@gmail.com": {
+      "email": "orlinadmin@gmail.com",
+      "role": "team-head",
+      "name": "Admin"
+    },
     "sanketugalmugale8412@gmail.com": {
       "email": "sanketugalmugale8412@gmail.com",
       "role": "team-head",

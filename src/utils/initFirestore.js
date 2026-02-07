@@ -45,3 +45,5 @@ if (typeof window !== 'undefined') {
   console.log('💡 To initialize Firestore, type: window.initFirestore()');
 }
 
+
+

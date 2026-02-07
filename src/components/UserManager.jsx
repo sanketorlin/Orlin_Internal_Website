@@ -3,6 +3,8 @@ import { X, Plus, Trash2, Save, Edit2, User, Mail, Shield, Lock } from 'lucide-r
 import { getUsers, addUser, updateUser, deleteUser, subscribeToUsers } from '../utils/usersService';
 import { createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase/config';
+import { sendWelcomeEmail } from '../utils/welcomeEmailService';
+import { sendLoginOTP } from '../utils/otpEmailService';
 
 const UserManager = ({ onClose }) => {
   const [users, setUsers] = useState({});
@@ -116,38 +118,131 @@ const UserManager = ({ onClose }) => {
           return;
         }
 
+        const userEmail = formData.email.toLowerCase().trim();
+        const userPassword = formData.password;
+
         // Create Firebase Auth user first
+        let firebaseUserCreated = false;
         try {
-          await createUserWithEmailAndPassword(
+          const userCredential = await createUserWithEmailAndPassword(
             auth,
-            formData.email.toLowerCase().trim(),
-            formData.password
+            userEmail,
+            userPassword
           );
-          console.log('✅ Firebase Auth user created');
+          console.log('✅ Firebase Auth user created:', userCredential.user.uid);
+          firebaseUserCreated = true;
         } catch (authError) {
+          console.error('Firebase Auth error:', authError.code, authError.message);
+          
           if (authError.code === 'auth/email-already-in-use') {
-            setError('This email is already registered. User can login with existing password.');
+            // User exists in Firebase Auth - check if they're in Firestore
+            const existingUsers = await getUsers();
+            if (existingUsers[userEmail]) {
+              setError('This email is already registered in the system. User can login with existing password.');
+            } else {
+              // User exists in Firebase but not in Firestore - add them to Firestore
+              console.log('⚠️ User exists in Firebase Auth but not in Firestore. Adding to Firestore...');
+              try {
+                await addUser(userEmail, {
+                  name: formData.name.trim(),
+                  role: formData.role
+                });
+                alert('✅ User added successfully!\n\n' +
+                      'Email: ' + userEmail + '\n\n' +
+                      '⚠️ Note: User already existed in Firebase Authentication.\n' +
+                      'User can login with their existing password.\n\n' +
+                      'Role and name have been updated in the system.');
+                resetForm();
+                return;
+              } catch (firestoreError) {
+                setError('User exists in Firebase but failed to add to system. Error: ' + firestoreError.message);
+                setLoading(false);
+                return;
+              }
+            }
+            setLoading(false);
+            return;
+          } else if (authError.code === 'auth/invalid-email') {
+            setError('Invalid email address. Please enter a valid email.');
+            setLoading(false);
+            return;
+          } else if (authError.code === 'auth/weak-password') {
+            setError('Password is too weak. Please use a stronger password (at least 6 characters).');
+            setLoading(false);
+            return;
+          } else if (authError.code === 'auth/network-request-failed') {
+            setError('Network error. Please check your internet connection and try again.');
             setLoading(false);
             return;
           }
+          // For other errors, throw to be caught by outer catch
           throw authError;
         }
 
         // Then add to Firestore for role management
-        await addUser(formData.email.toLowerCase().trim(), {
-          name: formData.name.trim(),
-          role: formData.role
-        });
+        try {
+          await addUser(userEmail, {
+            name: formData.name.trim(),
+            role: formData.role
+          });
+          console.log('✅ User added to Firestore');
+        } catch (firestoreError) {
+          console.error('Error adding user to Firestore:', firestoreError);
+          // If Firestore fails but Firebase Auth succeeded, we have a problem
+          // Try to delete the Firebase Auth user to keep things consistent
+          if (firebaseUserCreated) {
+            console.warn('⚠️ Firestore failed but Firebase Auth user was created. User may need to be manually cleaned up.');
+            setError('User created in Firebase Authentication but failed to add to system. Please try again or contact administrator. Error: ' + firestoreError.message);
+            setLoading(false);
+            return;
+          }
+          throw firestoreError;
+        }
         
-        const userEmail = formData.email.toLowerCase().trim();
-        const userPassword = formData.password;
+        // Send welcome email with credentials
+        console.log('📧 Sending welcome email to new user...');
+        const emailResult = await sendWelcomeEmail(
+          userEmail,
+          formData.name.trim(),
+          userPassword,
+          formData.role
+        );
+
+        // Also send OTP email (for account verification/welcome)
+        console.log('📧 Sending OTP email to new user...');
+        let otpResult = null;
+        try {
+          otpResult = await sendLoginOTP(userEmail);
+          console.log('✅ OTP email sent:', otpResult.emailSent ? 'Yes' : 'No');
+        } catch (otpError) {
+          console.warn('⚠️ OTP email failed (non-critical):', otpError);
+          // Don't fail user creation if OTP fails
+        }
+
+        // Success - show confirmation
+        let successMessage = '✅ User added successfully!\n\n' +
+              '📧 Email: ' + userEmail + '\n' +
+              '🔑 Password: ' + userPassword + '\n\n';
         
-        alert('✅ User added successfully!\n\n' +
-              'Email: ' + userEmail + '\n' +
-              'Password: ' + userPassword + '\n\n' +
-              '⚠️ IMPORTANT: Save this password!\n' +
-              'User can now login with these credentials.\n\n' +
-              'You can also send a password reset email later using the 🔒 icon.');
+        if (emailResult.emailSent) {
+          successMessage += '📬 Welcome email sent to user!\n';
+        } else {
+          successMessage += '⚠️ Welcome email not sent. ' + (emailResult.message || 'EmailJS not configured.') + '\n';
+        }
+        
+        if (otpResult && otpResult.emailSent) {
+          successMessage += '📬 OTP email sent to user!\n\n';
+        } else if (otpResult && otpResult.otp) {
+          successMessage += '⚠️ OTP email failed. OTP: ' + otpResult.otp + '\n\n';
+        } else {
+          successMessage += '⚠️ OTP email not sent.\n\n';
+        }
+        
+        successMessage += '⚠️ IMPORTANT: Save this password!\n' +
+              'User can now login immediately with these credentials.\n\n' +
+              '💡 Tip: You can send a password reset email later using the 🔒 icon.';
+        
+        alert(successMessage);
       }
 
       resetForm();

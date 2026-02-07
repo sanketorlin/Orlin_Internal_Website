@@ -100,3 +100,5 @@ if (typeof window !== 'undefined') {
   console.log('💡 Debug tools available! Type: window.debugSync.full()');
 }
 
+
+

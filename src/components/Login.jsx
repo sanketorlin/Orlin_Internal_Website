@@ -281,8 +281,8 @@ const Login = ({ onLoginSuccess }) => {
                 We'll send a password reset link to your email
               </p>
             </div>
-            {error && <div className="error-message">{error}</div>}
-            {success && <div className="success-message">{success}</div>}
+            {error && <div className="error-message" style={{ whiteSpace: 'pre-line' }}>{error}</div>}
+            {success && <div className="success-message" style={{ whiteSpace: 'pre-line' }}>{success}</div>}
             <div className="button-group">
               <button type="submit" disabled={loading} className="btn-primary">
                 {loading ? 'Sending...' : 'Send Reset Link'}

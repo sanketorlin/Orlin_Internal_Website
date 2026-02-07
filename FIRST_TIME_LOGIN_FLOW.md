@@ -228,3 +228,5 @@ The system is **already configured** to send OTP via email, but you need to set 
 
 See `EMAILJS_SETUP_GUIDE.md` for detailed setup instructions with screenshots.
 
+
+

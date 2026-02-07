@@ -22,3 +22,5 @@ for /f "tokens=2 delims=:" %%a in ('ipconfig ^| findstr /i "IPv4"') do (
 echo Press any key to exit...
 pause >nul
 
+
+
