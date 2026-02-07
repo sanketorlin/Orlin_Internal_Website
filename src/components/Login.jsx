@@ -13,7 +13,7 @@ const Login = ({ onLoginSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   // New device OTP states
   const [isNewDevice, setIsNewDevice] = useState(null); // null = checking, true = new device, false = trusted
   const [showOTP, setShowOTP] = useState(false);
@@ -59,7 +59,7 @@ const Login = ({ onLoginSuccess }) => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    
+
     if (!email || !email.includes('@')) {
       setError('Please enter a valid email address.');
       return;
@@ -77,17 +77,17 @@ const Login = ({ onLoginSuccess }) => {
         console.warn('Device check failed, proceeding with OTP flow:', deviceError);
         trusted = false;
       }
-      
+
       if (!trusted) {
         // New device - send OTP
         setShowOTP(true);
         setOtpSent(false);
         setOtp('');
         setOtpCode('');
-        
+
         const result = await sendLoginOTP(email);
         setOtpSent(true);
-        
+
         // Only set OTP code if email sending failed
         if (result.emailSent === false && result.otp) {
           // Email sending failed - show OTP in UI
@@ -148,7 +148,7 @@ const Login = ({ onLoginSuccess }) => {
     try {
       // Verify OTP
       await verifyOTP(email, otp);
-      
+
       // Mark device as trusted immediately after OTP verification
       try {
         await trustDevice(email);
@@ -164,7 +164,7 @@ const Login = ({ onLoginSuccess }) => {
         }));
         console.log('✅ Device marked as trusted in localStorage');
       }
-      
+
       // OTP verified - now show password field to complete login
       setSuccess('✅ OTP verified! Please enter your password to complete login.');
       setShowOTP(false);
@@ -172,7 +172,7 @@ const Login = ({ onLoginSuccess }) => {
       setOtp('');
       setOtpCode('');
       // Keep email, but now show password field
-      
+
     } catch (err) {
       setError(err.message || 'Invalid OTP. Please try again.');
     } finally {
@@ -189,18 +189,18 @@ const Login = ({ onLoginSuccess }) => {
 
     try {
       const user = await signIn(email, password);
-      
+
       // Trust device if not already trusted (for new devices that completed OTP)
       const trusted = await isDeviceTrusted(email);
       if (!trusted) {
         await trustDevice(email);
         console.log('✅ Device trusted after OTP + password login');
       }
-      
+
       onLoginSuccess(user.email);
     } catch (err) {
       let errorMessage = 'Login failed. Please try again.';
-      
+
       if (err.message === 'auth/user-not-found' || err.message?.includes('user-not-found')) {
         errorMessage = 'No account found with this email.';
       } else if (err.message === 'auth/wrong-password' || err.message?.includes('wrong-password')) {
@@ -210,7 +210,7 @@ const Login = ({ onLoginSuccess }) => {
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
+
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -235,7 +235,7 @@ const Login = ({ onLoginSuccess }) => {
     } catch (err) {
       console.error('Password reset error:', err);
       let errorMessage = err.message || 'Failed to send password reset email. Please try again.';
-      
+
       // Add troubleshooting tips
       if (err.message?.includes('user-not-found')) {
         errorMessage += '\n\n💡 Tip: Make sure the email is registered in Firebase Authentication.';
@@ -244,7 +244,7 @@ const Login = ({ onLoginSuccess }) => {
       } else {
         errorMessage += '\n\n💡 Troubleshooting:\n1. Check spam/junk folder\n2. Verify email in Firebase Console\n3. Check Firebase email quota\n4. Ensure email templates are configured';
       }
-      
+
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -255,12 +255,12 @@ const Login = ({ onLoginSuccess }) => {
   if (showResetPassword) {
     return (
       <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <Logo size="medium" showText={false} variant="dark" />
-          <h1 style={{ marginTop: '20px', marginBottom: '8px' }}>Reset Password</h1>
-          <p>Enter your email to receive password reset link</p>
-        </div>
+        <div className="login-card">
+          <div className="login-header">
+            <Logo size="medium" showText={false} variant="dark" />
+            <h1 style={{ marginTop: '20px', marginBottom: '8px' }}>Reset Password</h1>
+            <p>Enter your email to receive password reset link</p>
+          </div>
 
           <form onSubmit={handleResetPassword} className="login-form">
             <div className="form-group">
@@ -332,17 +332,17 @@ const Login = ({ onLoginSuccess }) => {
                 required
                 disabled={loading}
                 maxLength={6}
-                style={{ 
-                  textAlign: 'center', 
-                  fontSize: '24px', 
+                style={{
+                  textAlign: 'center',
+                  fontSize: '24px',
                   letterSpacing: '8px',
                   fontFamily: 'monospace'
                 }}
               />
               <p style={{ marginTop: '8px', fontSize: '13px', color: 'rgba(255, 255, 255, 0.6)' }}>
                 {otpCode && process.env.NODE_ENV === 'development' && (
-                  <span style={{ 
-                    display: 'block', 
+                  <span style={{
+                    display: 'block',
                     marginBottom: '8px',
                     padding: '8px',
                     background: 'rgba(74, 144, 226, 0.2)',
@@ -440,9 +440,9 @@ const Login = ({ onLoginSuccess }) => {
                 Use Different Email
               </button>
             </div>
-            <div style={{ 
-              marginTop: '24px', 
-              paddingTop: '24px', 
+            <div style={{
+              marginTop: '24px',
+              paddingTop: '24px',
               borderTop: '1px solid rgba(255, 255, 255, 0.08)',
               textAlign: 'center',
               fontSize: '12px',
@@ -467,7 +467,7 @@ const Login = ({ onLoginSuccess }) => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                disabled={loading || (showOTP && !otpSent)}
+                disabled={loading}
               />
               {isNewDevice === true && !otpSent && (
                 <p style={{ marginTop: '8px', fontSize: '13px', color: 'rgba(255, 200, 87, 0.9)' }}>
@@ -485,7 +485,7 @@ const Login = ({ onLoginSuccess }) => {
                 </p>
               )}
             </div>
-            
+
             {(!showOTP || (showOTP && !otpSent)) && (
               <div className="form-group">
                 <label htmlFor="password">
@@ -508,10 +508,10 @@ const Login = ({ onLoginSuccess }) => {
                 )}
               </div>
             )}
-            
+
             {error && <div className="error-message">{error}</div>}
             {success && <div className="success-message" style={{ whiteSpace: 'pre-line' }}>{success}</div>}
-            
+
             <button type="submit" disabled={loading} className="btn-primary">
               {loading ? (
                 <>
@@ -522,7 +522,7 @@ const Login = ({ onLoginSuccess }) => {
                 showOTP ? 'Send OTP' : 'Login'
               )}
             </button>
-            
+
             {!showOTP && (
               <button
                 type="button"
@@ -532,9 +532,23 @@ const Login = ({ onLoginSuccess }) => {
                 Forgot Password?
               </button>
             )}
-            <div style={{ 
-              marginTop: '24px', 
-              paddingTop: '24px', 
+
+            {showOTP && !otpSent && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('');
+                  // The useEffect will handle resetting the state
+                }}
+                className="btn-link"
+                style={{ marginTop: '8px', width: '100%' }}
+              >
+                Use Different Email
+              </button>
+            )}
+            <div style={{
+              marginTop: '24px',
+              paddingTop: '24px',
               borderTop: '1px solid rgba(255, 255, 255, 0.08)',
               textAlign: 'center',
               fontSize: '12px',
